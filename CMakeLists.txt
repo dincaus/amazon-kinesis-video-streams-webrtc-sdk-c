@@ -16,7 +16,8 @@ option(BUILD_STATIC_LIBS "Build all libraries statically. (This includes third-p
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(BUILD_LIBSRTP_HOST_PLATFORM "If buildng LibSRTP what is the current platform" OFF)
 option(BUILD_LIBSRTP_DESTINATION_PLATFORM "If buildng LibSRTP what is the destination platform" OFF)
-option(BUILD_SAMPLE "Build available samples" ON)
+option(BUILD_SAMPLE "Build available samples" OFF)
+option(BUILD_SERVICES "Build services" ON)
 option(ENABLE_DATA_CHANNEL "Enable support for data channel" ON)
 option(ENABLE_KVS_THREADPOOL "Enable support for KVS thread pool in signaling" OFF)
 option(INSTRUMENTED_ALLOCATORS "Enable memory instrumentation" OFF)
@@ -24,7 +25,6 @@ option(ENABLE_AWS_SDK_IN_TESTS "Enable support for compiling AWS SDKs for tests"
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
-option(BUILD_BENCHMARK "Build the benchmark tree." OFF)
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 option(COMPILER_WARNINGS "Enable all compiler warnings." OFF)
 option(ADDRESS_SANITIZER "Build with AddressSanitizer." OFF)
@@ -236,10 +236,6 @@ if(BUILD_DEPENDENCIES)
       build_dependency(awscpp)
     endif()
 
-  endif()
-
-  if(BUILD_BENCHMARK)
-    build_dependency(benchmark)
   endif()
 
   if (LINK_PROFILER)
@@ -463,13 +459,8 @@ install(DIRECTORY ${KINESIS_VIDEO_WEBRTC_CLIENT_SRC}/src/include/
   DESTINATION include
 )
 
-if (BUILD_SAMPLE)
-  # copy sample frames to build folder, in case developer runs sample program with command `samples/kvsWebrtcClientMaster` from `build` dir.
-  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/samples/opusSampleFrames" DESTINATION .)
-  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/samples/h264SampleFrames" DESTINATION .)
-  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/samples/h265SampleFrames" DESTINATION .)
-
-  add_subdirectory(samples)
+if(BUILD_SERVICES)
+  add_subdirectory(services)
 endif()
 
 if(BUILD_TEST)
@@ -480,9 +471,6 @@ if(BUILD_TEST)
   add_subdirectory(tst)
 endif()
 
-if(BUILD_BENCHMARK)
-  add_subdirectory(bench)
-endif()
 
 get_directory_property(clean_files ADDITIONAL_CLEAN_FILES)
 list(APPEND clean_files "${OPEN_SRC_INSTALL_PREFIX}")
